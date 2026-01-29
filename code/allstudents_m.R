@@ -57,4 +57,3 @@ summary_did_2x2 <- all_students_wide %>%
     n_obs      = n(),                                     # Observations per cell
     .groups = "drop"
   )
-summary_did_2x2 
