@@ -5,7 +5,6 @@ library(knitr)
 # Start with all students as the base
 master_panel <- all_students_wide %>%
   left_join(econ_disadv_wide, by = c("year", "jurisdiction")) %>%
-  left_join(free_lunch_wide, by = c("year", "jurisdiction")) %>%
   left_join(race_wide, by = c("year", "jurisdiction")) %>%
   left_join(ell_wide, by = c("year", "jurisdiction"))
 
@@ -21,7 +20,9 @@ master_panel_clean <- master_panel %>%
 
 master_panel_clean <- master_panel_clean %>%
   # Remove national aggregate and non-states
-  filter(!jurisdiction %in% c("National", "DoDEA", "Puerto Rico")) %>%
+  filter(!jurisdiction %in% c("National", "DoDEA", "Puerto Rico","New Jersey", "New York", "Rhode Island", "Washington")) %>%
+  # Keep only years from 2003 onwards
+  filter(year >= 2003) %>%
   
   # Make sure year is numeric
   mutate(year = as.numeric(year)) %>%
@@ -29,7 +30,7 @@ master_panel_clean <- master_panel_clean %>%
   # Clean up treatment indicators
   mutate(
     treated = ifelse(jurisdiction == "California", "1", "0"),
-    post = ifelse(year >= 2013, 1, 0)
+    post = ifelse(year >= 2014, 1, 0)
   )
 
   #Rename columns 
@@ -43,5 +44,5 @@ master_panel_clean <- master_panel_clean %>%
       post = as.numeric(post),
       DiD = treated * post
     )
-
   
+ 
