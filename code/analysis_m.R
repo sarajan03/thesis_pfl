@@ -4,7 +4,7 @@ library(fixest)
 master_panel_final <- master_panel_final %>%
   mutate(DiD = treated * post)
 
-subgroup_models <- feols(
+subgroup_other_m <- feols(
   c(score_all_students,
     score_econ_disadv,
     score_Hispanic,
@@ -16,7 +16,7 @@ subgroup_models <- feols(
 )
 
 large_states <- c("Florida", "Pennsylvania", "Texas")
-subgroup_large <- feols(
+subgroup_large_m <- feols(
   c(score_all_students,
     score_econ_disadv,
     score_Hispanic,
@@ -29,7 +29,7 @@ subgroup_large <- feols(
 )
 
 neighbors <- c("Arizona", "Oregon", "Nevada")
-subgroup_neighbors <- feols(
+subgroup_neighbors_m <- feols(
   c(score_all_students,
     score_econ_disadv,
     score_Hispanic,
@@ -40,35 +40,9 @@ subgroup_neighbors <- feols(
     filter(jurisdiction %in% c("California", neighbors)),
   cluster = ~jurisdiction
 )
-etable(
-  subgroup_models,
-  headers = c("All Students", "Econ. Disadv.", "Hispanic", "Black", "ELL"),
-  dict = c(DiD = "Post × California"),
-  keep = "%DiD",
-  se.below = TRUE,
-  fitstat = ~ n + r2
-)
-etable(
-  subgroup_large,
-  headers = c("All Students", "Econ. Disadv.", "Hispanic", "Black", "ELL"),
-  dict = c(DiD = "Post × California"),
-  keep = "%DiD",
-  se.below = TRUE,
-  fitstat = ~ n + r2
-)
 
 etable(
-  subgroup_neighbors,
-  headers = c("All Students", "Econ. Disadv.", "Hispanic", "Black", "ELL"),
-  dict = c(DiD = "Post × California"),
-  keep = "%DiD",
-  se.below = TRUE,
-  fitstat = ~ n + r2
-)
-
-
-etable(
-  subgroup_models,
+  subgroup_other_m,
   dict = c(
     score_all_students = "All Students Score",
     score_econ_disadv  = "Economically Disadvantaged Score",
@@ -84,12 +58,12 @@ etable(
     "Control Group: Non-PFL States" = as.character(1:5)  # convert to character
   ),
   tex = TRUE,                    # generate LaTeX
-  file = "did_other_states.tex"  # save to file,
+  file = "did_non-pfl_states_m.tex"  # save to file,
 )
 
 did_large_states  <- 
 etable(
-  subgroup_large,
+  subgroup_large_m,
   dict = c(
     score_all_students = "All Students Score",
     score_econ_disadv  = "Economically Disadvantaged Score",
@@ -99,18 +73,18 @@ etable(
     DiD                = "$\\\\beta_3$"
   ),
   keep = "%DiD",
-  se.below = TRUE,
+  se.below = TRUE, 
   fitstat = ~ n + r2,
   headers = list(
     "Control Group: Large States" = as.character(1:5)  # convert to character
   ),
   tex = TRUE,                    # generate LaTeX
-  file = "did_large_states.tex"  # save to file
+  file = "did_large_states_m.tex"  # save to file
 )
 
 did_neighbor_states <- 
   etable(
-  subgroup_neighbors,
+  subgroup_neighbors_m,
   dict = c(
     score_all_students = "All Students Score",
     score_econ_disadv  = "Economically Disadvantaged Score",
@@ -126,5 +100,5 @@ did_neighbor_states <-
     "Control Group: Neighboring States" = as.character(1:5)  # convert to character
   ),
   tex = TRUE,                    # generate LaTeX
-  file = "did_neighbor_states.tex"  # save to file
+  file = "did_neighbor_states_m.tex"  # save to file
 )

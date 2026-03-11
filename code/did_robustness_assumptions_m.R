@@ -1,6 +1,15 @@
 library(ggplot2)
 library(dplyr)
 
+master_panel_final <- master_panel_final %>%
+  mutate(
+    control_group = case_when(
+      is_california == TRUE   ~ "California",
+      is_large_state == TRUE  ~ "Large States",
+      is_neighbor == TRUE     ~ "Neighbors",
+      is_nonPFL == TRUE       ~ "Non-PFL States"
+    )
+  )
 
 # Step 1: Aggregate by year and control_group
 plot_data <- master_panel_final %>%
@@ -160,7 +169,7 @@ print(plot1)
 # Step 3: Save as LaTeX figure
 # Save plot as PDF
 ggsave(
-  filename = "parallel_trends.pdf",  # file name
+  filename = "parallel_trends_m.pdf",  # file name
   plot = plot1,                          # plot object
   width = ,                         # width in inches
   height = 4,                        # height in inches
@@ -218,6 +227,12 @@ plot_subgroups <- ggplot(plot_data_subgroups, aes(x = year, y = avg_score, color
     text = element_text(size = 12),
     legend.position = "bottom"
   )
-
+ggsave(
+  filename = "parallel_trends_subgroups_m.pdf",  # file name
+  plot = plot_subgroups,                          # plot object
+  width = ,                         # width in inches
+  height = 4,                        # height in inches
+  units = "in"
+)
 print(plot_subgroups)
 

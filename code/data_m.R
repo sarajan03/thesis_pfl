@@ -12,10 +12,11 @@ master_panel <- all_students_wide %>%
 #clean to remove info not available students
 master_panel_clean <- master_panel %>%
   # Remove columns that are placeholders / unknown
-  select(-starts_with("score_information_not_available")) %>%
-  # If you want, you can also drop the old 'all students' if redundant
+  select(
+    -matches("^score_information_not_available$|^sd_information_not_available$")
+  ) %>%
+  # Keep year, jurisdiction first, then everything else
   select(year, jurisdiction, everything())
-
 
 
 master_panel_clean <- master_panel_clean %>%

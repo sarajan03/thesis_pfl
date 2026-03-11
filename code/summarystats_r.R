@@ -4,8 +4,7 @@ library(knitr)
 library(kableExtra)
 
 #1.
-
-master_panel_final <- master_panel_clean %>%
+master_panel_final_r <- master_panel_clean_r %>%
   select(-score_ai_an, -score_two_plus) %>%
   mutate(
     is_california = jurisdiction == "California",
@@ -15,11 +14,11 @@ master_panel_final <- master_panel_clean %>%
   )
 
 # Now calculate summary stats for each group
-summary_stats <- bind_rows(
-  master_panel_final %>% filter(is_california) %>% mutate(control_group = "California"),
-  master_panel_final %>% filter(is_large_state) %>% mutate(control_group = "Large States"),
-  master_panel_final %>% filter(is_neighbor) %>% mutate(control_group = "Neighbors"),
-  master_panel_final %>% filter(is_nonPFL) %>% mutate(control_group = "Non-PFL States")
+summary_stats_r <- bind_rows(
+  master_panel_final_r %>% filter(is_california) %>% mutate(control_group = "California"),
+  master_panel_final_r %>% filter(is_large_state) %>% mutate(control_group = "Large States"),
+  master_panel_final_r %>% filter(is_neighbor) %>% mutate(control_group = "Neighbors"),
+  master_panel_final_r %>% filter(is_nonPFL) %>% mutate(control_group = "Non-PFL States")
 ) %>%
   group_by(control_group, post) %>%
   summarise(
@@ -37,7 +36,7 @@ summary_stats <- bind_rows(
   ) %>%
   mutate(period = ifelse(post == 1, "Post", "Pre"))
 # 3. Create the Main Table (Mean, SD, Min, Max)
-main_table <- summary_stats %>%
+main_table_r <- summary_stats_r %>%
   select(-post) %>%
   pivot_longer(cols = starts_with("score_"), names_to = c("Variable", "Stat"), names_sep = "__") %>%
   filter(Stat != "n") %>% # Remove N from the main metrics section
@@ -57,7 +56,7 @@ main_table <- summary_stats %>%
 
 # 4. Create the Observations (N) Row
 # We use 'score_all_students__n' to represent the sample size for that group/year
-n_row <- summary_stats %>%
+n_row_r <- summary_stats_r %>%
   select(control_group, period, score_all_students__n) %>%
   mutate(
     Stat = "mean",
@@ -75,18 +74,18 @@ n_row <- summary_stats %>%
 
 
 #5. 
-first_output <- bind_rows(main_table, n_row) %>%
+first_output_r <- bind_rows(main_table_r, n_row_r) %>%
   select(Variable, 
          matches("California_Pre"), matches("California_Post"),
          matches("Non-PFL States_Pre"), matches("Non-PFL States_Post"))
-         
-first_output<- first_output %>%
+
+first_output_r<- first_output_r %>%
   mutate(across(where(is.numeric), ~round(., 0))) %>%
   mutate(across(everything(), ~as.character(.))) %>%
   mutate(across(everything(), ~replace_na(., "")))
 
 
-first_output%>%
+first_output_r %>%
   kable(
     format = "latex",
     booktabs = TRUE,
@@ -101,7 +100,7 @@ first_output%>%
   row_spec(nrow(final_output), bold = TRUE, background = "#eeeeee")
 
 
-first_table <- first_output %>%
+first_table_r <- first_output_r %>%
   kable(
     format = "latex",
     booktabs = TRUE,
@@ -119,22 +118,22 @@ first_table <- first_output %>%
   kable_styling(latex_options = "hold_position")  # ← removed scale_down
 
 # 2. Save it to a .tex file
-save_kable(first_table, "first_table_m.tex")
-writeLines(first_table, "first_table_m.tex")
+save_kable(first_table_r, "first_table_r.tex")
+writeLines(first_table_r, "first_table_r.tex")
 
 
 
-second_output <- bind_rows(main_table, n_row) %>%
+second_output_r <- bind_rows(main_table_r, n_row_r) %>%
   select(Variable, 
          matches("Large States_Pre"), matches("Large States_Post"),
          matches("Neighbors_Pre"), matches("Neighbors_Post"))
 
-second_output<- second_output %>%
+second_output_r<- second_output_r %>%
   mutate(across(where(is.numeric), ~round(., 0))) %>%
   mutate(across(everything(), ~as.character(.))) %>%
   mutate(across(everything(), ~replace_na(., "")))
 
-second_output%>%
+second_output_r %>%
   kable(
     format = "latex",
     booktabs = TRUE,
@@ -148,7 +147,7 @@ second_output%>%
   row_spec(nrow(main_table), extra_css = "border-bottom: 2px solid black;") %>%
   row_spec(nrow(final_output), bold = TRUE, background = "#eeeeee")
 
-second_table <- second_output %>%
+second_table_r <- second_output_r %>%
   kable(
     format = "latex",
     booktabs = TRUE,
@@ -165,5 +164,5 @@ second_table <- second_output %>%
                      "Control Group: Neighbor States" = 8)) %>%
   kable_styling(latex_options = "hold_position")  # ← removed scale_down
 
-save_kable(second_table, "second_table_m.tex")
-writeLines(second_table, "second_table_m.tex")
+save_kable(second_table_r, "second_table_r.tex")
+writeLines(second_table_r, "second_table_r.tex")

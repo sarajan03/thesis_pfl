@@ -41,3 +41,50 @@ econ_disadv_wide <- econ_disadv_m_clean %>%
     names_prefix = "score_"
   )
 econ_disadv_wide
+
+
+# Read SD file
+econ_disadv_sd <- read.csv(
+  "/Users/sushmitarajan/Documents/GitHub/thesis_pfl/data/econ_disadv_sd_m.csv",
+  stringsAsFactors = FALSE,
+  skip = 8
+)
+
+# Select and rename columns
+econ_disadv_sd <- econ_disadv_sd %>%
+  select(Year, Jurisdiction, Economically.disadvantaged.status, Standard.deviation) %>%
+  rename(
+    year = Year,
+    jurisdiction = Jurisdiction,
+    econ_disadv_m = Economically.disadvantaged.status,
+    sd_value = Standard.deviation
+  )
+
+# Recode categories the same way as the mean dataset
+econ_disadv_sd <- econ_disadv_sd %>%
+  mutate(
+    econ_disadv_m = case_when(
+      econ_disadv_m == "Economically disadvantaged" ~ "econ_disadv",
+      econ_disadv_m == "Not economically disadvantaged" ~ "not_econ_disadv",
+      TRUE ~ "information_not_available"
+    ),
+    econ_disadv_m = str_trim(econ_disadv_m),
+    sd_value = as.numeric(sd_value)
+  ) %>%
+  filter(!is.na(sd_value))
+
+# Pivot SD wide
+econ_disadv_sd_wide <- econ_disadv_sd %>%
+  pivot_wider(
+    id_cols = c(year, jurisdiction),
+    names_from = econ_disadv_m,
+    values_from = sd_value,
+    names_prefix = "sd_"
+  )
+
+# Merge means and SD
+econ_disadv_wide <- econ_disadv_wide %>%
+  left_join(econ_disadv_sd_wide, by = c("year", "jurisdiction"))
+
+# View result
+head(econ_disadv_wide)

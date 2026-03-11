@@ -1,5 +1,6 @@
 library(ggplot2)
 library(dplyr)
+library(fixest)
 
 master_panel_final_r <- master_panel_final_r %>%
   mutate(
@@ -55,7 +56,13 @@ plot1_r<- ggplot(plot_data, aes(x = year, y = avg_score, color = control_group))
   )
 print(plot1_r)
 
-
+ggsave(
+  filename = "parallel_trends_r.pdf",  # file name
+  plot = plot1_r,                          # plot object
+  width = ,                         # width in inches
+  height = 4,                        # height in inches
+  units = "in"
+)
 # subgroup facet plot 
 
 plot_data_subgroups_r <- master_panel_final_r %>%
@@ -108,4 +115,14 @@ plot_subgroups_r <- ggplot(plot_data_subgroups, aes(x = year, y = avg_score, col
     legend.position = "bottom"
   )
 print(plot_subgroups_r)
+
+ggsave(
+  filename = "parallel_trends_subgroups_r.pdf",  # file name
+  plot = plot_subgroups_r,                          # plot object
+  width = ,                         # width in inches
+  height = 4,                        # height in inches
+  units = "in"
+)
+
+
 
